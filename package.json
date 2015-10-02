@@ -1,6 +1,6 @@
 {
   "name": "insider",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Dependency injection for nodejs and browser",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,8 @@
   },
   "keywords": [
     "dependency",
-    "injection"
+    "injection",
+    "ioc"
   ],
   "author": "lsm <liusenmiao@gmail.com>",
   "license": "MIT",
