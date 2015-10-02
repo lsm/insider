@@ -1,0 +1,27 @@
+{
+  "name": "insider",
+  "version": "0.1.0",
+  "description": "Dependency injection for nodejs and browser",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsm/insider.git"
+  },
+  "keywords": [
+    "dependency",
+    "injection"
+  ],
+  "author": "lsm <liusenmiao@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lsm/insider/issues"
+  },
+  "homepage": "https://github.com/lsm/insider#readme",
+  "dependencies": {
+    "lodash.assign": "3.2.0",
+    "lodash.toarray": "3.0.2"
+  }
+}
