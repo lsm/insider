@@ -1,11 +1,12 @@
 'use strict'
 
+var map = require('lodash.map')
+var keys = require('lodash.keys')
 var assign = require('lodash.assign')
 var toArray = require('lodash.toarray')
+var forEach = require('lodash.foreach')
 
-module.exports = Injector
-
-function Injector(injector) {
+var Injector = module.exports = function(injector) {
   this.dependencies = {}
   if (injector instanceof Injector) {
     this.mergeInjector(injector)
@@ -17,7 +18,7 @@ Injector.prototype = {
   regDependency: function(name, dependency) {
     if (typeof name === 'object') {
       var self = this
-      Object.keys(name).forEach(function(key) {
+      forEach(keys(name), function(key) {
         self.regDependency(key, name[key])
       })
       return
@@ -40,10 +41,10 @@ Injector.prototype = {
       return defaultValues
     }
 
-    return fnArgs.map(function(dependencyName, idx) {
+    return map(fnArgs, function(dependencyName, idx) {
       if (dependencyName && 'object' === typeof dependencyName) {
         var hashedDeps = {}
-        Object.keys(dependencyName).forEach(function(depKey) {
+        forEach(keys(dependencyName), function(depKey) {
           var depName = dependencyName[depKey]
           hashedDeps[depKey] = self.getDependency(depName)
         })
@@ -61,25 +62,26 @@ Injector.prototype = {
   },
 
   inject: function(fn, fnArgs) {
-    var _fn = fn
+    var ofn = fn
     var self = this
     fn = function() {
-        var defaultArgs = toArray(arguments)
-        var ctx
-        var injector
+      var defaultArgs = toArray(arguments)
+      var ctx
+      var injector
 
-        if (this instanceof Injector) {
-          ctx = 0
-          injector = this
-        } else {
-          ctx = this
-          injector = this.injector || self
-        }
-        var _args = injector.getDependencies(fnArgs, defaultArgs)
-        return _fn.apply(ctx, _args)
+      if (this instanceof Injector) {
+        ctx = 0
+        injector = this
+      } else {
+        ctx = this
+        injector = this.injector || self
       }
-      // keep the original function as a reference
-    fn.fn = _fn
+
+      var _args = injector.getDependencies(fnArgs, defaultArgs)
+      return ofn.apply(ctx, _args)
+    }
+    // keep the original function as a reference
+    fn.ofn = ofn
     return fn
   }
 }
