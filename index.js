@@ -13,14 +13,14 @@ var forEach = require('lodash.foreach')
 /**
  * Constructor
  *
- * @param  {Injector} [injector] Optional instance of injector
- *                               for merging dependencies from.
- * @return {Injector}            Instance of injector.
+ * @param  {Insider} [insider]  Optional instance of another insider
+ *                              for merging dependencies from.
+ * @return {Insider}            Instance of insider.
  */
-var Injector = module.exports = function(injector) {
+var Insider = module.exports = function(insider) {
   this.dependencies = {}
-  if (injector instanceof Injector) {
-    this.merge(injector)
+  if (insider instanceof Insider) {
+    this.merge(insider)
   }
 }
 
@@ -31,7 +31,7 @@ var Injector = module.exports = function(injector) {
  *                                   Or a hash of names and dependencies pairs (Object).
  * @param {Any} dependency           The dependency object.
  */
-Injector.prototype.set = function(name, dependency) {
+Insider.prototype.set = function(name, dependency) {
   if (typeof name === 'object') {
     var self = this
     forEach(keys(name), function(key) {
@@ -48,7 +48,7 @@ Injector.prototype.set = function(name, dependency) {
  * @param  {String} name  Name of the dependency to get.
  * @return {Any}          The dependency object.
  */
-Injector.prototype.get = function(name) {
+Insider.prototype.get = function(name) {
   return this.dependencies[name]
 }
 
@@ -58,7 +58,7 @@ Injector.prototype.get = function(name) {
  * @param  {String} name  Name of the dependency to check.
  * @return {Boolean}      True if exists. Otherwise False.
  */
-Injector.prototype.has = function(name) {
+Insider.prototype.has = function(name) {
   return this.dependencies.hasOwnProperty(name)
 }
 
@@ -69,7 +69,7 @@ Injector.prototype.has = function(name) {
  * @param  {Object} defaultValues Hash of default values for dependencies.
  * @return {Array}                Array of dependencies retrieved.
  */
-Injector.prototype.getAll = function(names, defaultValues) {
+Insider.prototype.getAll = function(names, defaultValues) {
   var self = this
   defaultValues = defaultValues || {}
   if (!names) {
@@ -93,12 +93,12 @@ Injector.prototype.getAll = function(names, defaultValues) {
 }
 
 /**
- * Merge current dependencies with another injector instance.
+ * Merge current dependencies with another insider instance.
  *
- * @param  {Injector} otherInjector The injector to merge with.
+ * @param  {Insider} otherInsider The insider to merge with.
  */
-Injector.prototype.merge = function(otherInjector) {
-  assign(this.dependencies, otherInjector.dependencies)
+Insider.prototype.merge = function(otherInsider) {
+  assign(this.dependencies, otherInsider.dependencies)
 }
 
 /**
@@ -108,25 +108,27 @@ Injector.prototype.merge = function(otherInjector) {
  * @param  {Array}   names   Array of names of dependencies need to be injected.
  * @return {Function}        The dependency injectable function converted.
  */
-Injector.prototype.inject = function(fn, names) {
-  var __original_fn__ = fn
+Insider.prototype.inject = function(fn, names) {
   var self = this
-  fn = function() {
-    var defaultArgs = toArray(arguments)
-    var ctx
-    var injector
+  var __original_fn__ = fn
 
-    if (this instanceof Injector) {
+  fn = function() {
+    var ctx
+    var insider
+    var defaultArgs = toArray(arguments)
+
+    if (this instanceof Insider) {
       ctx = 0
-      injector = this
+      insider = this
     } else {
       ctx = this
-      injector = this.injector || self
+      insider = this.insider || self
     }
 
-    var _args = injector.getAll(names, defaultArgs)
+    var _args = insider.getAll(names, defaultArgs)
     return __original_fn__.apply(ctx, _args)
   }
+
   // keep the original function as a reference
   fn.__original_fn__ = __original_fn__
   return fn
